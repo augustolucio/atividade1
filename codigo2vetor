@@ -1,0 +1,124 @@
+#include <stdio.h>
+#define TAM 20
+
+struct Conjunto {
+    int n;
+    int v[TAM];
+};
+
+
+void inicializar(struct Conjunto* c) {
+    c->n = 0;
+}
+
+void ler(struct Conjunto* c) {
+    printf("Digite o numero de elementos (max %d): ", TAM);
+    scanf("%d", &c->n);
+    if (c->n > TAM) {
+        c->n = 0;
+        printf("Tamanho maximo %d\n", TAM);
+        return;
+    }
+    printf("Digite os elementos:\n");
+    for (int i = 0; i < c->n; i++) {
+        scanf("%d", &c->v[i]);
+    }
+}
+
+void imprimir(struct Conjunto* c) {
+    if (c->n == 0) {
+        printf("Conjunto vazio.\n");
+        return;
+    }
+    printf("[");
+    for (int i = 0; i < c->n; i++) {
+        printf("%d", c->v[i]);
+        if (i < c->n - 1) {
+            printf(",");
+        }
+    }
+    printf("]\n");
+}
+
+void uniao(struct Conjunto* c1, struct Conjunto* c2) {
+    if (c1->n + c2->n > TAM) {
+        printf("Tamanho maximo %d\n", TAM);
+        return;
+    }
+    for (int i = c1->n, j = 0; j < c2->n; i++, j++) {
+        c1->v[i] = c2->v[j];
+    }
+    c1->n += c2->n;
+}
+
+void intersecao(struct Conjunto* c1, struct Conjunto* c2) {
+    int x = 0;
+    int vi[TAM];
+    for (int i = 0; i < c1->n; i++) {
+        for (int j = 0; j < c2->n; j++) {
+            if (c1->v[i] == c2->v[j]) {
+                vi[x++] = c1->v[i];
+                break;
+            }
+        }
+    }
+    c1->n = x;
+    for (int i = 0; i < x; i++) {
+        c1->v[i] = vi[i];
+    }
+}
+
+int main() {
+    struct Conjunto c, c2;
+    int opcao;
+    inicializar(&c);
+    inicializar(&c2);
+
+    do {
+        printf("\nMenu de Opções:\n");
+        printf("1. Ler Conjunto 1\n");
+        printf("2. Ler Conjunto 2\n");
+        printf("3. Imprimir Conjunto 1\n");
+        printf("4. Imprimir Conjunto 2\n");
+        printf("5. Calcular União\n");
+        printf("6. Calcular Interseção\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                ler(&c);
+                break;
+            case 2:
+                ler(&c2);
+                break;
+            case 3:
+                printf("Conteúdo do Conjunto 1: ");
+                imprimir(&c);
+                break;
+            case 4:
+                printf("Conteúdo do Conjunto 2: ");
+                imprimir(&c2);
+                break;
+            case 5:
+                uniao(&c, &c2);
+                printf("União realizada com sucesso. Conteúdo do Conjunto 1 atualizado:\n");
+                imprimir(&c);
+                break;
+            case 6:
+                intersecao(&c, &c2);
+                printf("Interseção realizada com sucesso. Conteúdo do Conjunto 1 atualizado:\n");
+                imprimir(&c);
+                break;
+            case 0:
+                printf("Saindo do programa.\n");
+                break;
+            default:
+                printf("Opção inválida. Tente novamente.\n");
+                break;
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
