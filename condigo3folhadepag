@@ -1,0 +1,117 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX_FUNCIONARIOS 10
+
+struct Empregado {
+    char nome[100], cargo[100];
+    double salarioBase, beneficios, descontos;
+};
+
+void lerEmpregado(struct Empregado* e) {
+    printf("Nome: ");
+    scanf("%[^\n]%*c", e->nome);
+    printf("Cargo: ");
+    scanf("%[^\n]%*c", e->cargo);
+    printf("Salário Base: ");
+    scanf("%lf%*c", &e->salarioBase);
+    printf("Benefícios: ");
+    scanf("%lf%*c", &e->beneficios);
+    printf("Descontos: ");
+    scanf("%lf%*c", &e->descontos);
+}
+
+void imprimirEmpregado(struct Empregado e) {
+    printf("Nome: %s\n", e.nome);
+    printf("Cargo: %s\n", e.cargo);
+    printf("Salário Base: R$%.2lf\n", e.salarioBase);
+    printf("Benefícios: R$%.2lf\n", e.beneficios);
+    printf("Descontos: R$%.2lf\n", e.descontos);
+    printf("Salário Líquido: R$%.2lf\n", (e.salarioBase + e.beneficios) - e.descontos);
+}
+
+struct Empresa {
+    struct Empregado empregados[MAX_FUNCIONARIOS];
+    double totalSalarios;
+    double maiorSalario;
+    int indiceMaior;
+    int contador;
+};
+
+void inicializarEmpresa(struct Empresa* emp) {
+    emp->contador = 0;
+    emp->totalSalarios = 0;
+    emp->maiorSalario = -99999999;
+    emp->indiceMaior = -1;
+}
+
+void lerEmpresa(struct Empresa* emp) {
+    if (emp->contador >= MAX_FUNCIONARIOS) {
+        printf("Empresa cheia\n");
+        return;
+    }
+    lerEmpregado(&emp->empregados[emp->contador]);
+    double salarioLiquido = (emp->empregados[emp->contador].salarioBase + emp->empregados[emp->contador].beneficios) - emp->empregados[emp->contador].descontos;
+    emp->totalSalarios += salarioLiquido;
+    if (salarioLiquido > emp->maiorSalario) {
+        emp->maiorSalario = salarioLiquido;
+        emp->indiceMaior = emp->contador;
+    }
+    emp->contador++;
+}
+
+void imprimirEmpresa(struct Empresa emp) {
+    for (int i = 0; i < emp.contador; i++) {
+        imprimirEmpregado(emp.empregados[i]);
+    }
+}
+
+void mediaSalarial(struct Empresa emp) {
+    if (emp.contador == 0) {
+        printf("Vazia\n");
+        return;
+    }
+    printf("Média salarial: R$%.2lf\n", emp.totalSalarios / emp.contador);
+}
+
+void maiorSalario(struct Empresa emp) {
+    if (emp.contador == 0) {
+        printf("Vazia\n");
+        return;
+    }
+    imprimirEmpregado(emp.empregados[emp.indiceMaior]);
+}
+
+void menuOperacoes(struct Empresa emp) {
+    int opcao;
+    printf("Escolha uma opção:\n");
+    printf("1. Adicionar Empregado\n2. Listar Empregados\n3. Calcular Média Salarial\n4. Mostrar Maior Salário\n5. Sair\n");
+    scanf("%d%*c", &opcao);
+    
+    if (opcao == 1) {
+        lerEmpresa(&emp);
+    } else if (opcao == 2) {
+        imprimirEmpresa(emp);
+    } else if (opcao == 3) {
+        mediaSalarial(emp);
+    } else if (opcao == 4) {
+        maiorSalario(emp);
+    } else if (opcao == 5) {
+        printf("Saindo...\n");
+    } else {
+        printf("Opção inválida!\n");
+    }
+}
+
+int main() {
+    struct Empresa minhaEmpresa;
+    inicializarEmpresa(&minhaEmpresa);
+    
+    int continuar = 1;
+    while (continuar) {
+        menuOperacoes(minhaEmpresa);
+        printf("Deseja continuar? (1: Sim, 0: Não): ");
+        scanf("%d%*c", &continuar);
+    }
+    
+    return 0;
+}
