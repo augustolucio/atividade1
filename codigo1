@@ -1,78 +1,77 @@
-#include<stdio.h>
-#include<ctime>
+#include <stdio.h>
+#include <time.h>
 #define MAX 50
 
 struct Data {
     int dia, mes, ano;
-
-    Data() {
-    }
-
-    Data(int d, int m, int a) {
-        dia = d;
-        mes = m;
-        ano = a;
-    }
-
-    void ler() {
-        scanf("%d/%d/%d%*c", &dia, &mes, &ano);
-    }
-
-    void imprimir() {
-        printf("%02d/%02d/%04d\n", dia, mes, ano);
-    }
-
-    int calcularIdade() {
-        std::time_t tempoAtual = std::time(0);
-        std::tm* agora = std::localtime(&tempoAtual);
-        Data hoje(agora->tm_mday,
-                  agora->tm_mon + 1,
-                  agora->tm_year + 1900);
-        if (mes < hoje.mes || (mes == hoje.mes && dia <= hoje.dia)) {
-            return hoje.ano - ano;
-        } else {
-            return (hoje.ano - ano) - 1;
-        }
-    }
 };
 
 struct Cliente {
     char nome[100];
-    Data nascimento;
+    struct Data nascimento;
     char genero;
     int idade;
-
-    void ler() {
-        scanf("%[^\n]%*c", nome);
-        nascimento.ler();
-        scanf("%c%*c", &genero);
-        idade = nascimento.calcularIdade();
-    }
-
-    void imprimir() {
-        printf("%s\n", nome);
-        nascimento.imprimir();
-        printf("%c\n", genero);
-        printf("%d\n", idade);
-    }
 };
 
+void lerData(struct Data *data) {
+    scanf("%d/%d/%d", &data->dia, &data->mes, &data->ano);
+}
+
+void imprimirData(struct Data data) {
+    printf("%02d/%02d/%04d\n", data.dia, data.mes, data.ano);
+}
+
+int calcularIdade(struct Data data) {
+    time_t tempoAtual = time(0);
+    struct tm* agora = localtime(&tempoAtual);
+    int anoAtual = agora->tm_year + 1900;
+    int mesAtual = agora->tm_mon + 1;
+    int diaAtual = agora->tm_mday;
+
+    if (data.mes < mesAtual || (data.mes == mesAtual && data.dia <= diaAtual)) {
+        return anoAtual - data.ano;
+    } else {
+        return (anoAtual - data.ano) - 1;
+    }
+}
+
+struct Cliente lerCliente() {
+    struct Cliente cliente;
+    printf("Digite o nome: ");
+    scanf(" %[^\n]", cliente.nome);
+    printf("Digite a data de nascimento (DD/MM/AAAA): ");
+    lerData(&cliente.nascimento);
+    printf("Digite o gênero (M/F): ");
+    scanf(" %c", &cliente.genero);
+    cliente.idade = calcularIdade(cliente.nascimento);
+    return cliente;
+}
+
+void imprimirCliente(struct Cliente cliente) {
+    printf("Nome: %s\n", cliente.nome);
+    printf("Data de Nascimento: ");
+    imprimirData(cliente.nascimento);
+    printf("Gênero: %c\n", cliente.genero);
+    printf("Idade: %d\n", cliente.idade);
+}
+
 int main() {
-    Cliente clientes[MAX];
+    struct Cliente clientes[MAX];
     int contador = 0, opcao;
     do {
         printf("1. Ler\n2. Listar\n");
-        scanf("%d%*c", &opcao);
+        scanf("%d", &opcao);
 
         if (opcao == 1) {
             if (contador >= MAX) {
                 printf("Capacidade máxima atingida\n");
             } else {
-                clientes[contador++].ler();
+                clientes[contador] = lerCliente(); // Lê o cliente e armazena na lista
+                contador++;
             }
         } else if (opcao == 2) {
             for (int i = 0; i < contador; i++) {
-                clientes[i].imprimir();
+                imprimirCliente(clientes[i]); // Passa o cliente para a função de impressão
             }
         }
     } while (opcao == 1 || opcao == 2);
