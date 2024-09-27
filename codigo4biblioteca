@@ -1,0 +1,119 @@
+#include <stdio.h>
+#include <string.h> 
+
+#define TAM 10
+
+struct Livro {
+    char titulo[100];
+    char autor[100];
+    int numPaginas;
+};
+
+
+void lerLivro(struct Livro* livro) {
+    printf("Dê o título do livro: ");
+    scanf(" %[^\n]%*c", livro->titulo);  
+    printf("Dê o autor do livro: ");
+    scanf(" %[^\n]%*c", livro->autor);
+    printf("Dê o número de páginas do livro: ");
+    scanf("%d%*c", &livro->numPaginas);
+}
+
+
+void imprimirLivro(struct Livro* livro) {
+    printf("Título: %s\n", livro->titulo);
+    printf("Autor: %s\n", livro->autor);
+    printf("Número de Páginas: %d\n", livro->numPaginas);
+}
+
+struct Biblioteca {
+    struct Livro livros[TAM];
+    int maiorPaginas;
+    int posicaoMaior;
+    int quantidade;
+};
+
+
+void inicializarBiblioteca(struct Biblioteca* biblioteca) {
+    biblioteca->quantidade = 0;
+    biblioteca->maiorPaginas = -99999999;
+    biblioteca->posicaoMaior = -1;
+}
+
+
+void lerBiblioteca(struct Biblioteca* biblioteca) {
+    if (biblioteca->quantidade >= TAM) {
+        printf("A biblioteca está cheia.\n");
+        return;
+    }
+    lerLivro(&biblioteca->livros[biblioteca->quantidade]);
+    if (biblioteca->livros[biblioteca->quantidade].numPaginas > biblioteca->maiorPaginas) {
+        biblioteca->maiorPaginas = biblioteca->livros[biblioteca->quantidade].numPaginas;
+        biblioteca->posicaoMaior = biblioteca->quantidade;
+    }
+    biblioteca->quantidade++;
+}
+
+
+void imprimirBiblioteca(struct Biblioteca* biblioteca) {
+    if (biblioteca->quantidade == 0) {
+        printf("Nenhum livro cadastrado.\n");
+        return;
+    }
+    for (int i = 0; i < biblioteca->quantidade; i++) {
+        imprimirLivro(&biblioteca->livros[i]);
+    }
+}
+
+
+void maiorNumPaginas(struct Biblioteca* biblioteca) {
+    if (biblioteca->quantidade == 0) {
+        printf("A biblioteca está vazia.\n");
+        return;
+    }
+    imprimirLivro(&biblioteca->livros[biblioteca->posicaoMaior]);
+}
+
+
+void maiorNumPaginasLoop(struct Biblioteca* biblioteca) {
+    if (biblioteca->quantidade == 0) {
+        printf("A biblioteca está vazia.\n");
+        return;
+    }
+    int maior = biblioteca->livros[0].numPaginas;
+    int posicao = 0;
+    for (int i = 1; i < biblioteca->quantidade; i++) {
+        if (biblioteca->livros[i].numPaginas > maior) {
+            maior = biblioteca->livros[i].numPaginas;
+            posicao = i;
+        }
+    }
+    imprimirLivro(&biblioteca->livros[posicao]);
+}
+
+int main() {
+    struct Biblioteca biblioteca;
+    inicializarBiblioteca(&biblioteca);
+    int opcao;
+
+    do {
+        printf("Escolha uma opção:\n");
+        printf("1. Ler\n");
+        printf("2. Listar\n");
+        printf("3. Maior\n");
+        printf("0. Sair\n");
+        printf("Opção: ");
+        scanf("%d%*c", &opcao);
+
+        if (opcao == 1) {
+            printf("Você escolheu a opção 'Ler'.\n");
+            lerBiblioteca(&biblioteca);
+        } else if (opcao == 2) {
+            imprimirBiblioteca(&biblioteca);
+        } else if (opcao == 3) {
+            maiorNumPaginas(&biblioteca);
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
